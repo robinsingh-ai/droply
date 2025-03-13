@@ -12,9 +12,15 @@
       "dest": "/api/peer.js",
       "headers": {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-        "Access-Control-Allow-Headers": "X-Requested-With,content-type"
+        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+        "Access-Control-Allow-Headers": "X-Requested-With,Content-Type,Authorization",
+        "Access-Control-Allow-Credentials": "true"
       }
     }
-  ]
+  ],
+  "env": {
+    "NEXT_PUBLIC_PEER_HOST": "droply-server-pf98.onrender.com",
+    "NODE_ENV": "production"
+  }
+} 
 } 
