@@ -10,6 +10,18 @@ class MyDocument extends Document {
     return (
       <Html>
         <Head>
+          {/* Google Analytics */}
+          <script async src="https://www.googletagmanager.com/gtag/js?id=G-YYQGPMZ9JX"></script>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-YYQGPMZ9JX');
+              `,
+            }}
+          />
           <link 
             rel="stylesheet" 
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" 
