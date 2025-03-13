@@ -1,0 +1,29 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Gradient definitions -->
+  <defs>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4A6FFF" />
+      <stop offset="60%" stop-color="#5D7FFF" />
+    </linearGradient>
+    <linearGradient id="itGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF5757" />
+      <stop offset="100%" stop-color="#FF7E7E" />
+    </linearGradient>
+    <linearGradient id="circleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4A6FFF" />
+      <stop offset="100%" stop-color="#3B5CE0" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Main text "Droply" with gradient -->
+  <text x="10" y="40" font-family="Arial, sans-serif" font-weight="bold" font-size="32" fill="url(#textGradient)">
+    Drop<tspan fill="url(#itGradient)">It</tspan>
+  </text>
+  
+  <!-- Download arrow icon with gradient -->
+  <g transform="translate(160, 32)">
+    <circle cx="15" cy="15" r="15" fill="url(#circleGradient)"/>
+    <path d="M15,7 L15,19 M10,14 L15,19 L20,14" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M10,23 L20,23" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg> 

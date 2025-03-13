@@ -1,0 +1,13 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Main text "Droply" -->
+  <text x="10" y="40" font-family="Arial, sans-serif" font-weight="bold" font-size="32" fill="#4A6FFF">
+    Drop<tspan fill="#FF5757">ly</tspan>
+  </text>
+  
+  <!-- Download arrow icon -->
+  <g transform="translate(160, 32)">
+    <circle cx="15" cy="15" r="15" fill="#4A6FFF"/>
+    <path d="M15,7 L15,19 M10,14 L15,19 L20,14" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M10,23 L20,23" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg> 
