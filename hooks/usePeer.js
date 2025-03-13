@@ -13,13 +13,29 @@ const prodConfig = {
     config: {
         iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:stun2.l.google.com:19302' },
+            { urls: 'stun:stun3.l.google.com:19302' },
+            { urls: 'stun:stun4.l.google.com:19302' },
             { urls: 'stun:global.stun.twilio.com:3478' },
             {
-                urls: "turn:openrelay.metered.ca:80",
-                username: "openrelayproject",
-                credential: "openrelayproject",
+                urls: 'turn:openrelay.metered.ca:80',
+                username: 'openrelayproject',
+                credential: 'openrelayproject'
+            },
+            {
+                urls: 'turn:openrelay.metered.ca:443',
+                username: 'openrelayproject',
+                credential: 'openrelayproject'
+            },
+            {
+                urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+                username: 'openrelayproject',
+                credential: 'openrelayproject'
             }
-        ]
+        ],
+        sdpSemantics: 'unified-plan',
+        iceTransportPolicy: 'all'
     },
     pingInterval: 3000,
     reconnectTimer: 2000,
@@ -94,13 +110,20 @@ const usePeer = () => {
         console.error("Peer error:", error);
         
         if (error.type === 'network' || error.type === 'disconnected') {
-            throwToast("error", "Network error. Attempting to reconnect...");
+            throwToast("error", "Network connection lost. Attempting to reconnect...");
+            setTimeout(() => {
+                if (typeof window !== 'undefined') {
+                    initializePeer();
+                }
+            }, 2000);
         } else if (error.type === 'peer-unavailable') {
-            throwToast("error", "Peer is not available or has disconnected.");
+            throwToast("error", "The peer you're trying to connect to is not available or may be behind a strict firewall.");
         } else if (error.type === 'server-error') {
-            throwToast("error", "Server connection error. Please try again later.");
+            throwToast("error", "Server connection error. Please try again in a moment.");
+        } else if (error.type === 'webrtc') {
+            throwToast("error", "WebRTC connection failed. Please ensure both devices allow WebRTC connections.");
         } else {
-            throwToast("error", "Connection error. Attempting to recover...");
+            throwToast("error", "Connection error. Please try refreshing the page.");
         }
         
         cleanUp();
@@ -195,14 +218,67 @@ const usePeer = () => {
     }, []);
 
     const connectToPeer = (peerID) => {
-        const connection = myself.connect(peerID);
-        setMyPeer(peerID);
-        setConnection(connection);
-        connection.on('open', () => {
-            setConnected(true);
-            throwToast("success", `You are now connected to ${peerID}`);
-        });
-        connection.on('data', handleReceiveData);
+        try {
+            if (!myself) {
+                throwToast("error", "Connection not ready. Please wait a moment and try again.");
+                return;
+            }
+
+            if (myConnection) {
+                myConnection.close();
+            }
+
+            console.log("Attempting to connect to peer:", peerID);
+
+            const connection = myself.connect(peerID, {
+                reliable: true,
+                serialization: "json",
+                metadata: { type: "data" },
+                retries: 3,
+                label: "droply-data-channel"
+            });
+
+            connection.on('error', (err) => {
+                console.error("Connection error:", err);
+                throwToast("error", "Failed to connect to peer. Please try again.");
+                cleanUp();
+            });
+
+            setMyPeer(peerID);
+            setConnection(connection);
+
+            const connectionTimeout = setTimeout(() => {
+                if (!isConnected) {
+                    console.log("Connection attempt timed out");
+                    throwToast("error", "Connection timed out. Please try again.");
+                    connection.close();
+                    cleanUp();
+                }
+            }, 20000);
+
+            connection.on('open', () => {
+                console.log("Connection opened successfully");
+                clearTimeout(connectionTimeout);
+                setConnected(true);
+                throwToast("success", `You are now connected to ${peerID}`);
+            });
+
+            connection.on('data', (data) => {
+                console.log("Received data of type:", data?.type);
+                handleReceiveData(data);
+            });
+
+            connection.on('close', () => {
+                console.log("Connection closed");
+                clearTimeout(connectionTimeout);
+                cleanUp();
+            });
+
+        } catch (error) {
+            console.error("Connection attempt failed:", error);
+            throwToast("error", "Failed to establish connection. Please try again.");
+            cleanUp();
+        }
     };
 
     const [fileToSend, setFileToSend] = useState(null);
@@ -237,14 +313,12 @@ const usePeer = () => {
             chunker,
             meta
         });
-        // Send File Meta first
         _startFileTransfer(id, chunker.totalChunks, meta);
     };
 
     const stopDownload = () => window.writer.abort();
 
     const resetTransfer = () => {
-        // Stop download if StreamSaver is used
         if(window.writer) stopDownload();
         setFileChunkIndex(null);
         setFileToSend(null);
@@ -315,7 +389,6 @@ const usePeer = () => {
 
     const [receiveIndex, setReceiveIndex] = useState(0);
 
-    // handle requesting & receiving file
     useEffect(() => {
         if(chunk === false)
             _requestForFileChunk(file && file.id, receiveIndex);
@@ -328,7 +401,6 @@ const usePeer = () => {
     const writeWithStreams = () => {
         let _chunk = new Uint8Array(chunk.chunk);
         writer.write(_chunk).then(() => {
-            // Release the references, sit back, and let the Garbage Collector do its job.
             _chunk = null;
             chunk.chunk = null;
         }); 
@@ -370,28 +442,15 @@ const usePeer = () => {
     };
 
     const createChunkWriter = file => {
-        /* Because of SSR, ensure streamSaver is loaded on client side. On the server, window === undefined !!
-           StreamSaver.js uses window object internally. 
-        */
         const streamSaver =  require("streamsaver");
    
-        /* Initialize a Write Stream so that we can send incoming chunks directly to the disk instead of
-          holding them in memory. 
-        */
         window.writer = streamSaver.createWriteStream(file.meta.name, {size:file.meta.size}).getWriter();
-        // Binding writer to window is akin to creating a global object. 
-        // Cannot use local variable since everything will reset when react redraws this component.
-
-        // Ensure that download is cancelled if user abruptly closes the window
         window.onunload = () => stopDownload();
      };
 
     const handleReceiveNewFile = (file) => {
         setReceivedFile(false);
         setReceiveIndex(0);
-        /* 
-        Conditionally switch to using WriteStream if file size > 50MB
-        */
         const switchSize = 50 * 1024 * 1024;
         const _useStream = file.meta.size > switchSize;
 
@@ -417,18 +476,14 @@ const usePeer = () => {
     const handleReceiveData = (data) => {
         if(data && data.type)
         {
-            // receive new file
             if(data.type === 'file_transfer_start')
                 handleReceiveNewFile(data);
             if(data.type === 'file_transfer_cancel')
                 handleCancelTransfer(data);
-            // process request for the next chunk
             else if(data.type === 'file_chunk_request')
                 setFileChunkIndex(data.index);
-            // send a new (/next) chunk
             else if(data.type === 'file_transfer_chunk')
                setChunk(data);
-            // confirmation receipt for file transfer
             else if(data.type === 'file_receipt')
             {
                 setData((data) => {
@@ -439,7 +494,6 @@ const usePeer = () => {
                     };
                 });
             }
-            // disconnection request
             else if(data.type === 'disconnect')
             {
                 throwToast("error", `Your peer left.`);
