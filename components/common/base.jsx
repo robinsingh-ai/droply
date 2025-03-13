@@ -5,7 +5,6 @@ import { ToastContainer } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-import '../../styles/bootstrap.min.css';
 import '../../styles/gg.css';
 import '../../styles/animate.css';
 import '../../styles/styles.css';

@@ -4,12 +4,26 @@ import { throwToast } from '../functions';
 import { getFileFromChunks, FileChunker } from '../functions';
 
 const prodConfig = {
-    host: process.env.NEXT_PUBLIC_VERCEL_URL || 'localhost',
-    secure: process.env.NEXT_PUBLIC_VERCEL_URL ? true : false,
-    port: process.env.NEXT_PUBLIC_VERCEL_URL ? 443 : 3000,
-    path: '/api/peer/droply',
-    debug: 1,
-    proxied: true
+    host: process.env.NEXT_PUBLIC_PEER_HOST?.replace('https://', '').replace('/', '') || 'localhost',
+    secure: process.env.NODE_ENV === 'production',
+    port: process.env.NODE_ENV === 'production' ? 443 : 9000,
+    path: '/droply',
+    key: 'peerjs',
+    debug: process.env.NODE_ENV === 'production' ? 0 : 3,
+    config: {
+        iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:global.stun.twilio.com:3478' },
+            {
+                urls: "turn:openrelay.metered.ca:80",
+                username: "openrelayproject",
+                credential: "openrelayproject",
+            }
+        ]
+    },
+    pingInterval: 5000,
+    reconnectTimer: 3000,
+    retries: 5
 };
 
 /* const prodConfig = {
@@ -26,8 +40,7 @@ const nameGeneratorConfig = {
     length: 2,
 };
 
-export default function usePeer() {
-
+const usePeer = () => {
     const [myself, setMyself] = useState(null);
     const [myPeer, setMyPeer] = useState(null);
     const [data, setData] = useState(null);
@@ -77,21 +90,77 @@ export default function usePeer() {
         cleanUp();
     };
 
-
     useEffect(() => {
-        import('peerjs').then(() => {
-            const myName = uniqueNamesGenerator(nameGeneratorConfig);
-            const peer =  myself ? myself : new Peer(myName, prodConfig);
+        let peer = null;
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = prodConfig.retries;
+        
+        const initializePeer = async () => {
+            try {
+                const PeerJs = await import('peerjs');
+                const myName = uniqueNamesGenerator(nameGeneratorConfig);
+                
+                if (peer) {
+                    peer.destroy();
+                }
+                
+                peer = new PeerJs.default(myName, prodConfig);
 
-            peer.on('open', () => handlePeerOpen(peer));
-            peer.on('connection', handlePeerConnection);
-            peer.on('disconnected', handlePeerDisconnect);
-            peer.on('close', handlePeerClose);
-            peer.on('error', handlePeerError);
-        });
-        return () => {
-            cleanUp()
+                peer.on('open', () => {
+                    reconnectAttempts = 0;
+                    handlePeerOpen(peer);
+                });
+                
+                peer.on('connection', handlePeerConnection);
+                
+                peer.on('disconnected', () => {
+                    console.log("Peer disconnected, attempting reconnect...");
+                    handlePeerDisconnect();
+                    
+                    if (reconnectAttempts < maxReconnectAttempts) {
+                        setTimeout(() => {
+                            console.log(`Reconnection attempt ${reconnectAttempts + 1}/${maxReconnectAttempts}`);
+                            reconnectAttempts++;
+                            peer.reconnect();
+                        }, prodConfig.reconnectTimer);
+                    } else {
+                        console.log("Max reconnection attempts reached");
+                        throwToast("error", "Connection lost. Please refresh the page to try again.");
+                        cleanUp();
+                    }
+                });
+                
+                peer.on('close', () => {
+                    console.log("Peer connection closed");
+                    handlePeerClose();
+                });
+                
+                peer.on('error', (err) => {
+                    console.error("Peer error:", err);
+                    handlePeerError(err);
+                    
+                    if (err.type === 'network' || err.type === 'disconnected') {
+                        throwToast("error", "Network error. Attempting to reconnect...");
+                    }
+                });
+                
+            } catch (error) {
+                console.error('PeerJS initialization error:', error);
+                throwToast("error", "Failed to initialize peer connection");
+                cleanUp();
+            }
+        };
+
+        if (typeof window !== 'undefined') {
+            initializePeer();
         }
+
+        return () => {
+            if (peer) {
+                peer.destroy();
+            }
+            cleanUp();
+        };
     }, []);
 
     const connectToPeer = (peerID) => {
@@ -359,4 +428,6 @@ export default function usePeer() {
         transferFile,
         cancelTransfer,
     }];
-}
+};
+
+export default usePeer;

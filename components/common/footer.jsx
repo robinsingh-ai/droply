@@ -135,7 +135,7 @@ const FooterWrapper = styled.footer`
   }
 `;
 
-export default () => {
+const Footer = () => {
   const features = [
     { icon: 'fas fa-shield-alt', text: 'End-to-end encryption' },
     { icon: 'fas fa-ban', text: 'No data collection' },
@@ -197,4 +197,6 @@ export default () => {
       </div>
     </FooterWrapper>
   );
-}
+};
+
+export default Footer;

@@ -67,7 +67,7 @@ const ScannerContainer = styled.div`
   }
 `;
 
-export default ({ onScan }) => {
+const QrScan = ({ onScan }) => {
     const [isScanning, setIsScanning] = useState(true);
     const { theme } = useTheme();
     
@@ -98,4 +98,6 @@ export default ({ onScan }) => {
             </div>
         </ScannerContainer>
     );
-}
+};
+
+export default QrScan;

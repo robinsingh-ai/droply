@@ -72,7 +72,7 @@ const TabButton = styled.button`
   }
 `;
 
-export default ({ sent, received, onSaveReceived }) => {
+const FilesShared = ({ sent, received, onSaveReceived }) => {
     const [activeTab, setActiveTab] = React.useState('received');
     const { theme } = useTheme();
 
@@ -126,4 +126,6 @@ export default ({ sent, received, onSaveReceived }) => {
             </div>
         </FileSharedViewerContainer>
     );
-}
+};
+
+export default FilesShared;

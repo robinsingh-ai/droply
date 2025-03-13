@@ -328,7 +328,7 @@ const Copyright = styled.div`
   }
 `;
 
-export default ({ myCode, isLoading, onConnect }) => {
+const Header = ({ myCode, isLoading, onConnect }) => {
     const [showConnector, setShowConnector] = useState(false);
     const { theme } = useTheme();
 
@@ -422,4 +422,6 @@ export default ({ myCode, isLoading, onConnect }) => {
             </PopUp>
         </React.Fragment>
     );
-}
+};
+
+export default Header;

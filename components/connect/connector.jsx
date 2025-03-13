@@ -101,7 +101,7 @@ const LoadingSpinner = styled.div`
     }
 `;
 
-export default ({ myCode, onConnect, isLoading }) => {
+const Connector = ({ myCode, onConnect, isLoading }) => {
     const [type, setType] = useState('qrCode');
     const { theme } = useTheme();
 
@@ -189,4 +189,6 @@ export default ({ myCode, onConnect, isLoading }) => {
             </ButtonGroup>
         </StandaloneContentArea>
     );
-}
+};
+
+export default Connector;

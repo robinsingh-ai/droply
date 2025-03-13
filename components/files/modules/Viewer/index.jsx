@@ -22,7 +22,7 @@ const ErrorContainer = styled.div`
   }
 `;
 
-export default ({ fileData, showSaveButton, showCancelButton, onCancel }) => {
+const Index = ({ fileData, showSaveButton, showCancelButton, onCancel }) => {
 
     const handleDownload = () => {
         const tempLink = document.createElement('a');
@@ -44,4 +44,6 @@ export default ({ fileData, showSaveButton, showCancelButton, onCancel }) => {
             <div>File Damaged. Ask to Resend</div>
         </ErrorContainer>
     }</div>;
-}
+};
+
+export default Index;

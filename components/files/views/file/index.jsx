@@ -61,11 +61,13 @@ const SizeText = styled.span`
   margin-left: 0.5rem;
 `;
 
-export default ({
-    url, status: { progress, state, kbps }, meta, useStream,
-    showSaveButton, showCancelButton,
-    onSave, onCancel
-}) => {
+const Index = (
+    {
+        url, status: { progress, state, kbps }, meta, useStream,
+        showSaveButton, showCancelButton,
+        onSave, onCancel
+    }
+) => {
 
     const renderStateText =
     state === 'processing' ? <StatusText success>Processing</StatusText> :
@@ -138,4 +140,6 @@ export default ({
             </div>
         </div>
     </FilePreviewContainer>
-}
+};
+
+export default Index;

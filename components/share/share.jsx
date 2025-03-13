@@ -162,11 +162,13 @@ const Copyright = styled.div`
   }
 `;
 
-export default ({
-    myCode, peerCode, currentFile, isTransferring,
-    filesReceived: filesReceivedProps, filesSent: filesSentProps,
-    onSend, onCancel, onDisconnect
-}) => {
+const Share = (
+    {
+        myCode, peerCode, currentFile, isTransferring,
+        filesReceived: filesReceivedProps, filesSent: filesSentProps,
+        onSend, onCancel, onDisconnect
+    }
+) => {
 
     const [filesQueued, setFilesQueued] = useState([]);
     const [filesReceived, setFilesReceived] = useState(filesReceivedProps ? filesReceivedProps : []);
@@ -347,4 +349,6 @@ export default ({
             </NavButton>
         </MobileNavBar>
     </React.Fragment>
-}
+};
+
+export default Share;

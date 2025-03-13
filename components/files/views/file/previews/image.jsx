@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default ({ url, meta: { name, } }) => {
+const Image = ({ url, meta: { name, } }) => {
 
     return <div>
         <div className="row mx-0">
@@ -19,3 +19,5 @@ export default ({ url, meta: { name, } }) => {
     </div>
 
 };
+
+export default Image;

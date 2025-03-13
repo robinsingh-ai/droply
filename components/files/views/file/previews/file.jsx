@@ -48,7 +48,7 @@ const FilePreviewContainer = styled.div`
   }
 `;
 
-export default ({ meta: { name, type }, }) => {
+const File = ({ meta: { name, type }, }) => {
     const fileType = type.split('/')[1] || type;
     
     return (
@@ -65,3 +65,5 @@ export default ({ meta: { name, type }, }) => {
         </FilePreviewContainer>
     );
 };
+
+export default File;

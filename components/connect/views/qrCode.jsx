@@ -58,7 +58,7 @@ const QRCodeContainer = styled.div`
   }
 `;
 
-export default ({ code }) => {
+const QrCode = ({ code }) => {
     const { theme } = useTheme();
     
     return (
@@ -90,4 +90,6 @@ export default ({ code }) => {
             <div className="info-text">Click to copy</div>
         </QRCodeContainer>
     );
-}
+};
+
+export default QrCode;

@@ -79,7 +79,7 @@ const TopBar = styled.nav`
   }
 `;
 
-export default () => {
+const Topbar = () => {
     const { theme } = useTheme();
     
     return (
@@ -101,4 +101,6 @@ export default () => {
             </div>
         </TopBar>
     );
-}
+};
+
+export default Topbar;

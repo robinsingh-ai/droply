@@ -72,7 +72,7 @@ const PeerCard = styled.div`
     }
 `;
 
-export default ({ code, onDisconnect }) => {
+const PeerCardComponent = ({ code, onDisconnect }) => {
     const { theme } = useTheme();
 
     return (
@@ -94,4 +94,6 @@ export default ({ code, onDisconnect }) => {
             </div>
         </PeerCard>
     );
-}
+};
+
+export default PeerCardComponent;

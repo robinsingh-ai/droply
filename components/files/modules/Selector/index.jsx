@@ -101,7 +101,7 @@ const FooterFileSelector = styled.div`
   }
 `;
 
-export default ({ queue, onSelect, onCancel }) => {
+const Index = ({ queue, onSelect, onCancel }) => {
 
     const getFileURL = (file) => {
         const fileSize = file.size / (1024 * 1024);
@@ -194,4 +194,6 @@ export default ({ queue, onSelect, onCancel }) => {
             </div>
         </div>
     </FileSelectorWrap>;
-}
+};
+
+export default Index;

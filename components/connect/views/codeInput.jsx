@@ -71,7 +71,7 @@ const InputForm = styled.form`
   }
 `;
 
-export default ({ onConnect }) => {
+const CodeInput = ({ onConnect }) => {
     const [peerCode, setPeerCode] = useState('');
     const { theme } = useTheme();
     
@@ -112,4 +112,6 @@ export default ({ onConnect }) => {
             </InputForm>
         </CodeInputContainer>
     );
-}
+};
+
+export default CodeInput;
