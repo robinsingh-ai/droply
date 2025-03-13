@@ -21,9 +21,9 @@ const prodConfig = {
             }
         ]
     },
-    pingInterval: 5000,
-    reconnectTimer: 3000,
-    retries: 5
+    pingInterval: 3000,
+    reconnectTimer: 2000,
+    retries: 7
 };
 
 /* const prodConfig = {
@@ -91,13 +91,25 @@ const usePeer = () => {
     };
 
     const handlePeerError = (error) => {
-        console.log("peer error", error);
+        console.error("Peer error:", error);
+        
+        if (error.type === 'network' || error.type === 'disconnected') {
+            throwToast("error", "Network error. Attempting to reconnect...");
+        } else if (error.type === 'peer-unavailable') {
+            throwToast("error", "Peer is not available or has disconnected.");
+        } else if (error.type === 'server-error') {
+            throwToast("error", "Server connection error. Please try again later.");
+        } else {
+            throwToast("error", "Connection error. Attempting to recover...");
+        }
+        
         cleanUp();
     };
 
     useEffect(() => {
         let peer = null;
         let reconnectAttempts = 0;
+        let reconnectTimer = null;
         const maxReconnectAttempts = prodConfig.retries;
         
         const initializePeer = async () => {
@@ -111,7 +123,13 @@ const usePeer = () => {
                 
                 peer = new PeerJs.default(myName, prodConfig);
 
+                if (reconnectTimer) {
+                    clearTimeout(reconnectTimer);
+                    reconnectTimer = null;
+                }
+
                 peer.on('open', () => {
+                    console.log("Peer connection established");
                     reconnectAttempts = 0;
                     handlePeerOpen(peer);
                 });
@@ -122,36 +140,41 @@ const usePeer = () => {
                     console.log("Peer disconnected, attempting reconnect...");
                     handlePeerDisconnect();
                     
-                    if (reconnectAttempts < maxReconnectAttempts) {
-                        setTimeout(() => {
+                    const attemptReconnect = () => {
+                        if (reconnectAttempts < maxReconnectAttempts) {
                             console.log(`Reconnection attempt ${reconnectAttempts + 1}/${maxReconnectAttempts}`);
                             reconnectAttempts++;
-                            peer.reconnect();
-                        }, prodConfig.reconnectTimer);
-                    } else {
-                        console.log("Max reconnection attempts reached");
-                        throwToast("error", "Connection lost. Please refresh the page to try again.");
-                        cleanUp();
-                    }
+                            
+                            try {
+                                peer.reconnect();
+                            } catch (error) {
+                                console.error("Reconnection failed:", error);
+                                const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 10000);
+                                reconnectTimer = setTimeout(attemptReconnect, delay);
+                            }
+                        } else {
+                            console.log("Max reconnection attempts reached");
+                            throwToast("error", "Unable to reconnect. Please refresh the page.");
+                            cleanUp();
+                        }
+                    };
+                    
+                    attemptReconnect();
                 });
                 
                 peer.on('close', () => {
                     console.log("Peer connection closed");
+                    if (reconnectTimer) {
+                        clearTimeout(reconnectTimer);
+                    }
                     handlePeerClose();
                 });
                 
-                peer.on('error', (err) => {
-                    console.error("Peer error:", err);
-                    handlePeerError(err);
-                    
-                    if (err.type === 'network' || err.type === 'disconnected') {
-                        throwToast("error", "Network error. Attempting to reconnect...");
-                    }
-                });
+                peer.on('error', handlePeerError);
                 
             } catch (error) {
                 console.error('PeerJS initialization error:', error);
-                throwToast("error", "Failed to initialize peer connection");
+                throwToast("error", "Failed to initialize connection. Please refresh the page.");
                 cleanUp();
             }
         };
@@ -161,6 +184,9 @@ const usePeer = () => {
         }
 
         return () => {
+            if (reconnectTimer) {
+                clearTimeout(reconnectTimer);
+            }
             if (peer) {
                 peer.destroy();
             }
