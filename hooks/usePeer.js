@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { uniqueNamesGenerator, adjectives, animals } from 'unique-names-generator';
+import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator';
 import { throwToast } from '../functions';
 import { getFileFromChunks, FileChunker } from '../functions';
 
@@ -35,9 +35,14 @@ const prodConfig = {
  };*/
 
 const nameGeneratorConfig = {
-    dictionaries: [adjectives, animals],
+    dictionaries: [colors, adjectives, animals],
     separator: '-',
-    length: 2,
+    length: 3,
+    style: 'capital'
+};
+
+const generateUniqueId = () => {
+    return uniqueNamesGenerator(nameGeneratorConfig);
 };
 
 const usePeer = () => {
@@ -98,7 +103,7 @@ const usePeer = () => {
         const initializePeer = async () => {
             try {
                 const PeerJs = await import('peerjs');
-                const myName = uniqueNamesGenerator(nameGeneratorConfig);
+                const myName = generateUniqueId();
                 
                 if (peer) {
                     peer.destroy();
