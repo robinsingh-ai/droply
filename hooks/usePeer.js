@@ -4,11 +4,12 @@ import { throwToast } from '../functions';
 import { getFileFromChunks, FileChunker } from '../functions';
 
 const prodConfig = {
-    host: 'localhost',
-    secure: false,
-    port: 9000,
-    path: '/droply',
-    debug: 1
+    host: process.env.NEXT_PUBLIC_VERCEL_URL || 'localhost',
+    secure: process.env.NEXT_PUBLIC_VERCEL_URL ? true : false,
+    port: process.env.NEXT_PUBLIC_VERCEL_URL ? 443 : 3000,
+    path: '/api/peer/droply',
+    debug: 1,
+    proxied: true
 };
 
 /* const prodConfig = {

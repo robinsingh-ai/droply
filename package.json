@@ -3,14 +3,10 @@
   "version": "1.0.0",
   "description": "Droply File Transfer App",
   "scripts": {
+    "dev": "next dev",
     "build": "next build",
-    "build-analyse": "ANALYZE=true next build",
-    "build-export": "npm run build && npm run export",
-    "dev": "next",
-    "export": "next export",
-    "start": "next start -p 80",
-    "deploy": "next build && next start -p 80",
-    "dev-deploy": "next build && next start"
+    "start": "next start",
+    "lint": "next lint"
   },
   "author": "robinsingh <robin25tech@gmail.com>",
   "dependencies": {
@@ -75,7 +71,9 @@
     "store2": "^2.11.1",
     "streamsaver": "^2.0.4",
     "unique-names-generator": "^4.3.0",
-    "universal-cookie": "^4.0.3"
+    "universal-cookie": "^4.0.3",
+    "peer": "^1.0.0",
+    "@vercel/node": "^2.15.1"
   },
   "devDependencies": {
     "@babel/runtime-corejs2": "^7.9.6",
