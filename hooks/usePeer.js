@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { uniqueNamesGenerator, adjectives, animals } from 'unique-names-generator';
+import { uniqueNamesGenerator, adjectives, animals, colors } from 'unique-names-generator';
 import { throwToast } from '../functions';
 import { getFileFromChunks, FileChunker } from '../functions';
 
 const prodConfig = {
     host: process.env.NEXT_PUBLIC_PEER_HOST?.replace('https://', '').replace('/', '') || 'localhost',
     secure: process.env.NODE_ENV === 'production',
-    port: process.env.NODE_ENV === 'production' ? 443 : 9000,
+    port: process.env.NEXT_PUBLIC_PEER_PORT ? parseInt(process.env.NEXT_PUBLIC_PEER_PORT) : (process.env.NODE_ENV === 'production' ? 443 : 9000),
     path: '/droply',
     key: 'peerjs',
     debug: process.env.NODE_ENV === 'production' ? 0 : 3,
@@ -26,18 +26,11 @@ const prodConfig = {
     retries: 5
 };
 
-/* const prodConfig = {
-     host: '10.0.0.9',
-     secure: false,
-     port: 9000,
-     path: '/myapp',
-     debug: 0
- };*/
 
 const nameGeneratorConfig = {
-    dictionaries: [adjectives, animals],
+    dictionaries: [adjectives, colors, animals],
     separator: '-',
-    length: 2,
+    length: 3,
 };
 
 const usePeer = () => {

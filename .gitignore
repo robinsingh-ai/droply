@@ -129,3 +129,6 @@ dist
 
 
 .vercel
+
+.env.production
+.env.development

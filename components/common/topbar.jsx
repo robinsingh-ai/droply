@@ -9,13 +9,16 @@ const TopBar = styled.nav`
   left: 0;
   top: 0;
   width: 100%;
-  background-color: ${props => props.theme.colors.cardBackground};
+  background-color: ${props => props.theme.isDark ? 
+    'rgba(25, 25, 30, 0.85)' : 
+    'rgba(255, 255, 255, 0.9)'};
   padding: 1.25rem 1.5rem;
   z-index: 3000;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   border-bottom: 1px solid ${props => props.theme.colors.border};
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   
   @media (max-width: 768px) {
     padding: 1rem 1rem;
@@ -38,6 +41,11 @@ const TopBar = styled.nav`
       width: 38px;
       height: 38px;
       object-fit: contain;
+      transition: transform 0.3s ease;
+      
+      &:hover {
+        transform: rotate(10deg);
+      }
       
       @media (max-width: 768px) {
         width: 32px;
@@ -76,6 +84,7 @@ const TopBar = styled.nav`
   .nav-actions {
     display: flex;
     align-items: center;
+    gap: 1rem;
   }
 `;
 
@@ -92,7 +101,7 @@ const Topbar = () => {
                         className="brand-icon"
                     />
                     <div className="brand-text">droply</div>
-                    <span className="version-badge">beta</span>
+                    
                 </div>
                 
                 <div className="nav-actions">

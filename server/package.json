@@ -4,9 +4,11 @@
   "description": "PeerJS server for Droply file transfer application",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "NODE_ENV=production node server.js",
+    "dev": "NODE_ENV=development node server.js"
   },
   "dependencies": {
+    "dotenv": "^16.4.7",
     "peer": "^1.0.0"
   }
-} 
+}
