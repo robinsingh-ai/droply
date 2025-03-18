@@ -382,10 +382,7 @@ const Header = ({ myCode, isLoading, onConnect }) => {
                             </p>
                         </div>
                     )}
-                    
-                    <Copyright theme={theme}>
-                        Made by Robin &copy; {new Date().getFullYear()} All Rights Reserved
-                    </Copyright>
+                   
                 </div>
             </HeroSection>
             

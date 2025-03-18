@@ -172,20 +172,12 @@ const Footer = () => {
             </ul>
           </div>
           
-          <div className="footer-section">
-            <h3 className="title">Quick Links</h3>
-            <ul className="features-list">
-              <li><i className="fas fa-chevron-right"></i><span>How it works</span></li>
-              <li><i className="fas fa-chevron-right"></i><span>About us</span></li>
-              <li><i className="fas fa-chevron-right"></i><span>Support</span></li>
-              <li><i className="fas fa-chevron-right"></i><span>FAQ</span></li>
-            </ul>
-          </div>
+        
         </div>
         
         <div className="footer-bottom">
           <div className="copyright">
-            Created by <a href="#">Robin</a> &copy; 2025 All Rights Reserved
+            Created by <a href="https://www.robinsingh.xyz">Robin</a> &copy; 2025 All Rights Reserved
           </div>
           
           <div className="legal-links">
